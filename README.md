@@ -1,4 +1,4 @@
-# Guestbook Monitoring with Pulumi
+# Guestbook Monitoring using Pulumi, Prometheus & Grafana
 
 This project builds on the standard Pulumi Kubernetes Guestbook example and adds a monitoring stack on top of it using Prometheus and Grafana. The monitoring side is deployed via the `kube-prometheus-stack` Helm chart, managed through Pulumi, while the Guestbook app itself stays as-is in Kubernetes.
 
@@ -7,11 +7,20 @@ This project builds on the standard Pulumi Kubernetes Guestbook example and adds
 The Guestbook (frontend + Redis leader + replica) runs in the cluster like normal. On top of that, Prometheus Operator watches for ServiceMonitor resources, which point it at the Guestbook services so it knows what to scrape. Grafana then sits on top of Prometheus as its data source.
 
 ```
-Guestbook (frontend, redis-leader, redis-replica)
-        -> ServiceMonitors
-        -> Prometheus
-        -> Grafana
-```
+Guestbook Application                      
+ ├── Frontend                               
+ ├── Redis Leader                           
+ └── Redis Replica                          
+          │                                  
+          ▼                                  
+     ServiceMonitors                        
+          │                                  
+          ▼                                  
+     Prometheus                             
+         │                                  
+         ▼                                  
+      Grafana 
+
 
 ## Why I did it this way
 
@@ -21,7 +30,7 @@ Guestbook (frontend, redis-leader, redis-replica)
 
 **ServiceMonitor** - Lets Prometheus Operator auto-discover the services instead of me manually editing scrape configs every time something changes.
 
-## Stack
+## Technology Stack
 
 - Pulumi (TypeScript)
 - Kubernetes
@@ -30,7 +39,7 @@ Guestbook (frontend, redis-leader, redis-replica)
 - Grafana
 - Minikube (for local testing)
 
-## What's in here
+## Implemented Features
 
 - Guestbook deployed through Pulumi
 - Prometheus + Grafana deployed via the official Helm chart
@@ -39,7 +48,7 @@ Guestbook (frontend, redis-leader, redis-replica)
 - Grafana exposed via NodePort
 - Grafana connection info available as a Pulumi output
 
-## Running it
+## Deployment
 
 ```bash
 npm install
@@ -65,7 +74,7 @@ kubectl get servicemonitor -n monitoring
 pulumi stack output
 ```
 
-## Getting to the UIs
+## Accessing the Application
 
 **Guestbook**
 
@@ -105,7 +114,7 @@ One thing worth calling out: the Guestbook app itself doesn't expose a `/metrics
 - Put this behind an Ingress with TLS instead of NodePort/port-forwarding
 - Move the Grafana credentials into a proper secrets manager instead of hardcoding them
 
-## Included in this submission
+## Repository Contents
 
 - `index.ts` (Pulumi source)
 - Pulumi config files
